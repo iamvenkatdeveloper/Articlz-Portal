@@ -1,0 +1,13 @@
+[{
+        "Name": "Articles",
+        "Path": "/Articles"
+    },
+    {
+        "Name": "Favorites",
+        "Path": "/Favorites"
+    },
+    {
+        "Name": "Publish",
+        "Path": "/Publish"
+    }
+]
