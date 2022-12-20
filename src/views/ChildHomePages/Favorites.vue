@@ -132,9 +132,7 @@
               </div>
             </v-col>
             <v-col cols="12" md="12" sm="12" xs="12">
-              <div class="py-3">
-                {{ item.article_data ? item.article_data : "-" }}
-              </div>
+              <div class="py-3" v-html="item.article_data"></div>
             </v-col>
           </v-row>
         </v-carousel-item>

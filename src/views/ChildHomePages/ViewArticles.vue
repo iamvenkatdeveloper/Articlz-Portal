@@ -3,8 +3,12 @@
     <LoginPage :LoginPageDialog="LoginPageDialog" @close="LoginPageDialogExit" />
     <v-app-bar app clipped-left color="primary" elevation="0">
       <v-toolbar dense flat color="primary" class="pa-0 ma-0">
-        <v-card class="elevation-0" tile @click="$router.push('/')" :style="'cursor: pointer;'">
-          <v-img contain width="125px" src="@/assets/ArticlzLogo.png"></v-img>
+        <v-card class="elevation-0" tile @click="$router.push('/')" :style="'cursor: pointer;'" color="primary">
+          <v-img
+            contain
+            :width="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '90px' : '125px'"
+            src="@/assets/ArticlzLogo.png"
+          ></v-img>
         </v-card>
         <v-spacer />
         <v-btn dark text class="text-capitalize" @click="LoginPageDialog = true"> Sign in/sign up </v-btn>
@@ -23,9 +27,14 @@
     <v-main>
       <v-card-text>
         <!-- ***************************************************************************************************** -->
-        <v-carousel v-model="CurrentIdx" hide-delimiters height="auto">
+        <v-carousel
+          v-model="CurrentIdx"
+          hide-delimiters
+          height="auto"
+          :show-arrows-on-hover="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs'"
+        >
           <v-carousel-item v-for="(item, idx) in ArticlesList" :key="idx">
-            <v-row no-gutters class="mx-5 px-15">
+            <v-row no-gutters :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '' : 'mx-5 px-15'">
               <v-col cols="12" md="12" sm="12" xs="12">
                 <v-toolbar flat dense class="ma-0 pa-0" :color="$vuetify.theme.dark == true ? '#121212' : ''">
                   <div class="font-weight-bold">
@@ -51,13 +60,22 @@
                 </v-toolbar>
               </v-col>
               <v-col cols="12" md="12" sm="12" xs="12">
-                <div class="display-1">
+                <div :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'MobileHeading' : 'display-1'">
                   {{ item.article_title }}
                 </div>
-                <div class="Description py-5">{{ item.article_description }}</div>
+                <div :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'Description py-2' : 'Description py-5'">
+                  {{ item.article_description }}
+                </div>
               </v-col>
               <v-col cols="12" md="12" sm="12" xs="12">
-                <v-img class="" :src="item.image_src" alt="No Image found!" height="400px" max-width="100%" align="center"></v-img>
+                <v-img
+                  class=""
+                  :src="item.image_src"
+                  alt="No Image found!"
+                  :height="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '200px' : '400px'"
+                  max-width="100%"
+                  align="center"
+                ></v-img>
               </v-col>
               <v-col cols="12" md="12" sm="12" xs="12">
                 <div class="mt-3">
@@ -72,9 +90,7 @@
                 </div>
               </v-col>
               <v-col cols="12" md="12" sm="12" xs="12">
-                <div class="py-3">
-                  {{ item.article_data ? item.article_data : "-" }}
-                </div>
+                <div class="py-3" v-html="item.article_data"></div>
               </v-col>
             </v-row>
           </v-carousel-item>
@@ -131,5 +147,25 @@ export default {
 <style>
 .FooterText {
   font-size: 16px;
+}
+.MobileHeading {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+/* Previous Button */
+
+.v-window__prev {
+  position: fixed;
+  top: 50%;
+  left: 20px !important;
+}
+
+/* Next Button */
+
+.v-window__next {
+  position: fixed;
+  top: 50%;
+  right: 20px !important;
 }
 </style>

@@ -176,8 +176,9 @@
             ></v-select>
           </v-col>
           <v-col cols="12" md="12">
-            <v-textarea rows="10" outlined dense label="Details" :rules="[(v) => !!v || 'Details are required']" v-model="article.article_data">
-            </v-textarea>
+            <!-- <v-textarea rows="10" outlined dense label="Details" :rules="[(v) => !!v || 'Details are required']" v-model="article.article_data"> 
+            </v-textarea> -->
+            <vue-editor v-model="article.article_data"></vue-editor>
           </v-col>
         </v-row>
       </v-form>
@@ -189,6 +190,8 @@
 import Snackbar from "@/components/Extras/Snackbar.vue";
 
 import DeleteArticle from "@/components/Publish/Dialogs/DeleteArticle.vue";
+
+import { VueEditor } from "vue2-editor";
 
 export default {
   data: () => ({
@@ -250,6 +253,7 @@ export default {
   }),
   components: {
     Snackbar,
+    VueEditor,
     DeleteArticle,
   },
   async mounted() {
@@ -322,6 +326,7 @@ export default {
             publisher_email_id: "admin@articlz.com",
             favourite: false,
           };
+          console.log("article", article);
           let article_list = this.$store.getters.get_articles_list;
           article_list.push(article);
           this.$store.commit("SET_ARTICLES_LIST", article_list);

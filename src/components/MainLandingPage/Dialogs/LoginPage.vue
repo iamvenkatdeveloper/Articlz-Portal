@@ -1,11 +1,11 @@
 <template>
-  <v-dialog persistent max-width="450" v-model="LoginPageDialog">
+  <v-dialog persistent max-width="450" v-model="LoginPageDialog" :fullscreen="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs'">
     <v-card class="elevation-0 pb-5" :color="$vuetify.theme.dark == true ? '#272727' : ''">
       <v-toolbar dense flat>
         <v-spacer />
         <v-btn icon @click="LoginPageDialogExit"><v-icon> mdi-close </v-icon></v-btn>
       </v-toolbar>
-      <v-card-text align="center" justify="center">
+      <v-card-text align="center" justify="center" :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'centerLogin' : ''">
         <v-row no-gutters>
           <v-col cols="12" md="12">
             <span class="display-1">{{ CurrentTitle }}</span>
@@ -132,8 +132,15 @@ export default {
   watch: {
     step(val) {
       if (val == 1) this.CurrentTitle = "Login";
-      else if (val == 2) this.CurrentTitle = "Forgot Password";
-      else if (val == 3) this.CurrentTitle = "SignUp";
+      else if (val == 2) {
+        this.CurrentTitle = "Forgot Password";
+        this.ForgotEmail = "";
+        this.$refs.formForgotPassword.reset();
+      } else if (val == 3) {
+        this.CurrentTitle = "SignUp";
+        this.signupEmailID = "";
+        this.$refs.formSignUp.reset();
+      }
     },
     LoginPageDialog(val) {
       if (val == true) {
@@ -182,6 +189,28 @@ export default {
         };
       }
     },
+    ForgotPasswordMethod() {
+      if (this.$refs.formForgotPassword.validate()) {
+        this.loading = true;
+        setTimeout(() => {
+          this.SnackBarComponent = {
+            SnackbarVmodel: true,
+            SnackbarColor: "green",
+            Top: true,
+            SnackbarText: "Reset Password link sent successfully!",
+          };
+          this.loading = false;
+          this.step = 1;
+        }, 500);
+      } else {
+        this.SnackBarComponent = {
+          SnackbarVmodel: true,
+          SnackbarColor: "red",
+          Top: true,
+          SnackbarText: "Please fill in required fields!",
+        };
+      }
+    },
     LoginPageDialogExit() {
       this.mounted = false;
       this.$refs.form.reset();
@@ -213,4 +242,12 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.centerLogin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+</style>

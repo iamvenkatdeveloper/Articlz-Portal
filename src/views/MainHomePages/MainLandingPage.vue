@@ -3,9 +3,14 @@
     <LoginPage :LoginPageDialog="LoginPageDialog" @close="LoginPageDialogExit" />
     <v-app-bar app clipped-left color="primary" elevation="0">
       <v-toolbar dense flat color="primary" class="pa-0 ma-0">
-        <v-card class="elevation-0" tile @click="$router.push('/')" :style="'cursor: pointer;'">
-          <v-img contain width="125px" src="@/assets/ArticlzLogo.png"></v-img>
+        <v-card color="primary" elevation="0" @click="$router.push('/')" :style="'cursor: pointer;'">
+          <v-img
+            contain
+            :width="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '90px' : '125px'"
+            src="@/assets/ArticlzLogo.png"
+          ></v-img>
         </v-card>
+
         <v-spacer />
         <v-btn dark text class="text-capitalize" @click="LoginPageDialog = true"> Sign in/sign up </v-btn>
         <v-tooltip bottom>
@@ -21,12 +26,12 @@
       </v-toolbar>
     </v-app-bar>
     <v-main>
-      <v-card tile height="370" color="primary">
+      <v-card tile :height="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '625' : '375'" color="primary">
         <v-card-text align="left">
-          <v-row no-gutters class="mx-5">
+          <v-row no-gutters :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '' : 'mx-5'">
             <v-col cols="12" md="7" sm="12">
-              <div class="pt-10">
-                <p class="font-weight-light display-3 pt-5 ml-5 white--text">Articles for Everyone !</p>
+              <div :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '' : 'pt-13'">
+                <p class="font-weight-light display-3 pt-2 ml-5 white--text">Articles for Everyone !</p>
                 <blockquote class="blockquote text-left white--text">
                   <p class="mb-0">Explore more than 1000+ articles on different topics that helps you grow, learn and do more...</p>
                   <br />
@@ -39,12 +44,17 @@
               </div>
             </v-col>
             <v-col cols="12" md="5" sm="12">
-              <v-img src="@/assets/BackgroundImage.png" contain height="350" class="mt-n3" />
+              <v-img
+                src="@/assets/BackgroundImage.png"
+                contain
+                height="350"
+                :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'mt-n16' : 'mt-n3'"
+              />
             </v-col>
           </v-row>
         </v-card-text>
       </v-card>
-      <v-row no-gutters class="ma-5">
+      <v-row no-gutters :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'ma-1' : 'ma-5'">
         <v-col cols="12" md="3" v-for="(item, idx) in ArticlesList" :key="idx">
           <v-hover v-slot="{ hover }">
             <v-card
