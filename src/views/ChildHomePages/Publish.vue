@@ -3,7 +3,10 @@
     <Snackbar :SnackBarComponent="SnackBarComponent" />
     <DeleteArticle :DeleteArticleDialog="DeleteArticleDialog" @clicked="DeleteArticleDialogExit" />
     <v-toolbar flat class="mt-5" :color="$vuetify.theme.dark == true ? '#121212' : ''">
-      <div class="display-1 dark_text--text mt-n5">
+      <div
+        v-if="$vuetify.breakpoint.name == 'md' || $vuetify.breakpoint.name == 'lg' || $vuetify.breakpoint.name == 'xl'"
+        class="display-1 dark_text--text mt-n5"
+      >
         {{ CurrentView == "LIST_VIEW" ? "Publish" : StoreObj.action == "CREATE" ? "Publish Article" : "Edit Article" }}
       </div>
       <v-spacer />
@@ -17,8 +20,8 @@
         v-model="search"
         prepend-inner-icon="mdi-magnify"
         color="primary"
-        class="mt-3 mr-4"
-        :style="'max-width: 250px;'"
+        :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'mt-2 mr-2 ml-n3' : 'mt-3 mr-4'"
+        :style="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'max-width: 300px;' : 'max-width: 250px;'"
       >
       </v-text-field>
       <v-menu v-model="FilterMenu" bottom offset-y :close-on-content-click="false">
@@ -65,7 +68,7 @@
       </v-tooltip>
       <!-- =========================== PUBLISH VIEW ============================= -->
       <v-btn
-        v-if="CurrentView == 'PUBLISH_VIEW'"
+        v-if="CurrentView == 'DETAIL_VIEW'"
         small
         class="borderRadius text-capitalize mt-n5 mr-2"
         color="primary"
@@ -74,7 +77,7 @@
         ><v-icon small class="mr-1">mdi-chevron-double-left</v-icon>back</v-btn
       >
       <v-btn
-        v-if="CurrentView == 'PUBLISH_VIEW'"
+        v-if="CurrentView == 'DETAIL_VIEW'"
         small
         class="borderRadius text-capitalize mt-n5"
         color="primary"
@@ -151,11 +154,19 @@
       </v-col>
     </v-row>
     <!-- ***************************************************************************************************** -->
-    <v-card-text v-else-if="CurrentView == 'PUBLISH_VIEW'">
+    <v-card-text v-else-if="CurrentView == 'DETAIL_VIEW'">
       <v-form ref="form">
         <v-row no-gutters>
           <v-col cols="12" md="12">
-            <v-text-field outlined dense label="Title" :rules="[(v) => !!v || 'Title is required']" v-model="article.article_title"> </v-text-field>
+            <v-text-field
+              outlined
+              dense
+              label="Title"
+              :rules="[(v) => !!v || 'Title is required']"
+              v-model="article.article_title"
+              :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'mt-n4' : ''"
+            >
+            </v-text-field>
           </v-col>
           <v-col cols="12" md="12">
             <v-text-field outlined dense label="Description" :rules="[(v) => !!v || 'Description is required']" v-model="article.article_description">
@@ -171,8 +182,8 @@
               :items="PublishCategoryItems"
               v-model="article.category"
               :rules="[(v) => !!v || 'Category is required']"
-              class="ml-4"
               label="Category"
+              :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '' : 'ml-4'"
             ></v-select>
           </v-col>
           <v-col cols="12" md="12">
@@ -260,7 +271,13 @@ export default {
     this.ArticlesList = this.$store.getters.get_articles_list.filter(
       (itm) => itm.publisher_email_id === this.$store.getters.get_current_user_details.user_email_id
     );
+    this.$store.commit("SET_PREVIOUS_ROUTE", this.$store.getters.get_current_route);
     this.$store.commit("SET_CURRENT_ROUTE", this.$route.name);
+
+    if (this.$store.getters.get_previous_route != this.$route.name && this.$store.getters.get_from_detail_view == true) {
+      this.$store.commit("SET_DETAIL_VIEW", false);
+      this.$router.push("/" + this.$store.getters.get_previous_route);
+    }
     this.CurrentView = "LIST_VIEW";
     this.FilterMethod();
     console.warn("ArticlesList", this.ArticlesList);
@@ -275,6 +292,13 @@ export default {
         this.ArticlesList = this.$store.getters.get_articles_list
           .filter((itm) => itm.publisher_email_id == this.$store.getters.get_current_user_details.user_email_id)
           .filter((itm) => itm.article_title.toLowerCase().includes(val.toLowerCase()));
+      }
+    },
+    CurrentView(val) {
+      if (val == "DETAIL_VIEW") {
+        this.$store.commit("SET_DETAIL_VIEW", true);
+      } else {
+        this.$store.commit("SET_DETAIL_VIEW", false);
       }
     },
   },
@@ -296,7 +320,7 @@ export default {
           this.article.article_data = "";
           this.article.image_src = "";
           this.article.category = "";
-          this.CurrentView = "PUBLISH_VIEW";
+          this.CurrentView = "DETAIL_VIEW";
           break;
         case "EDIT":
           this.article.article_title = this.StoreObj.article_title;
@@ -304,7 +328,7 @@ export default {
           this.article.article_data = this.StoreObj.article_data;
           this.article.image_src = this.StoreObj.image_src;
           this.article.category = this.StoreObj.category;
-          this.CurrentView = "PUBLISH_VIEW";
+          this.CurrentView = "DETAIL_VIEW";
           break;
         case "DELETE":
           this.DeleteArticleDialog = true;

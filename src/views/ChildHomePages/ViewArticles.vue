@@ -25,7 +25,7 @@
       </v-toolbar>
     </v-app-bar>
     <v-main>
-      <v-card-text>
+      <v-card-text :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'ma-0 pa-0 mt-3 px-3' : ''">
         <!-- ***************************************************************************************************** -->
         <v-carousel
           v-model="CurrentIdx"
@@ -48,7 +48,7 @@
                         v-on="on"
                         icon
                         v-model="item.favourite"
-                        @click.stop="LoginPageDialog = true"
+                        @click.stop="AddToFavorite(idx)"
                         dark
                         :color="$vuetify.theme.dark == true ? '#121212' : ''"
                       >
@@ -63,7 +63,7 @@
                 <div :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'MobileHeading' : 'display-1'">
                   {{ item.article_title }}
                 </div>
-                <div :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'Description py-2' : 'Description py-5'">
+                <div :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'MobileDescription py-2' : 'Description py-5'">
                   {{ item.article_description }}
                 </div>
               </v-col>
@@ -128,11 +128,6 @@ export default {
   },
   mounted() {
     this.ArticlesList = Articles;
-    // for (let i = 0; i < this.ArticlesList.length; i++) {
-    //   this.ArticlesList[i].article_data = this.ArticlesList[i].article_data.replaceAll("\\n", "<br>");
-    // }
-    console.log(this.ArticlesList);
-
     this.CurrentIdx = this.$store.getters.get_current_idx;
     document.body.scrollTop = document.documentElement.scrollTop = 0;
   },
@@ -150,6 +145,11 @@ export default {
 }
 .MobileHeading {
   font-size: 18px;
+  font-weight: 400;
+}
+
+.MobileDescription {
+  font-size: 16px;
   font-weight: 400;
 }
 

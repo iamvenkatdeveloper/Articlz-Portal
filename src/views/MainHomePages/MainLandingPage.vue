@@ -28,7 +28,7 @@
     <v-main>
       <v-card tile :height="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '625' : '375'" color="primary">
         <v-card-text align="left">
-          <v-row no-gutters :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '' : 'mx-5'">
+          <v-row no-gutters :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'ml-n3' : 'mx-5'">
             <v-col cols="12" md="7" sm="12">
               <div :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '' : 'pt-13'">
                 <p class="font-weight-light display-3 pt-2 ml-5 white--text">Articles for Everyone !</p>
@@ -91,8 +91,22 @@
               </v-card-text>
             </v-card>
           </v-hover>
-        </v-col></v-row
-      >
+        </v-col>
+        <v-col cols="12" md="3">
+          <v-hover v-slot="{ hover }">
+            <v-card
+              class="ma-2 grey"
+              :elevation="hover ? 12 : 2"
+              :class="{ 'on-hover': hover }"
+              :color="$vuetify.theme.dark == true ? '#272727' : ''"
+              @click="LoginPageDialog = true"
+              height="246"
+            >
+              <div :style="'position: absolute; top:  38%; left: 20%'" class="display-1 font-weight-thin white--text">more articles...</div>
+            </v-card>
+          </v-hover>
+        </v-col>
+      </v-row>
       <v-footer tile height="100" color="#2B3A55">
         <v-card-text class="font-weight-light white--text" align="center"
           ><div class="FooterText">Copyright &#169; Articlz {{ new Date().getFullYear() }}</div>

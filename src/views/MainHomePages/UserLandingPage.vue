@@ -10,23 +10,25 @@
         </v-toolbar>
       </div>
       <div v-else>
-        <v-card class="elevation-0 mt-1" tile @click="$router.push('/Articles')" :style="'cursor: pointer;'">
-          <v-img v-if="!$vuetify.theme.dark" contain width="120px" src="@/assets/ArticlzLogoLight.png"></v-img>
-          <v-img v-if="$vuetify.theme.dark" contain width="120px" src="@/assets/ArticlzLogoDark.png"></v-img>
-        </v-card>
-        <v-btn text dense v-for="(item, idx) in RouterList" :key="idx" class="mx-1" @click="$router.push(item.Path)">
-          {{ item.Name }}
-        </v-btn>
-        <v-btn
-          v-if="$store.getters.get_current_user_details.user_type == 'READER'"
-          text
-          dense
-          color="red"
-          class="mx-1"
-          @click="BecomePublisherDialog = true"
-        >
-          become a Publisher
-        </v-btn>
+        <v-toolbar flat dense style="background-color: transparent" class="mx-n7">
+          <v-card class="elevation-0 mt-1" tile @click="$router.push('/Articles')" :style="'cursor: pointer;'">
+            <v-img v-if="!$vuetify.theme.dark" contain width="120px" src="@/assets/ArticlzLogoLight.png"></v-img>
+            <v-img v-if="$vuetify.theme.dark" contain width="120px" src="@/assets/ArticlzLogoDark.png"></v-img>
+          </v-card>
+          <v-btn text dense v-for="(item, idx) in RouterList" :key="idx" class="mx-1" @click="OpenPage(item)">
+            {{ item.Name }}
+          </v-btn>
+          <v-btn
+            v-if="$store.getters.get_current_user_details.user_type == 'READER'"
+            text
+            dense
+            color="red"
+            class="mx-1"
+            @click="BecomePublisherDialog = true"
+          >
+            become a Publisher
+          </v-btn>
+        </v-toolbar>
       </div>
       <v-spacer />
       <v-tooltip bottom>
@@ -41,11 +43,14 @@
       </v-tooltip>
       <v-menu v-model="ProfileMenu" open-on-hover bottom offset-y :close-on-content-click="false">
         <template v-slot:activator="{ on, attrs }">
-          <v-btn icon v-on="on" v-bind="attrs" @click="ProfileMenu = true" class="mr-1">
+          <v-btn icon v-on="on" v-bind="attrs" @click="ProfileMenu = true">
             <v-icon class="mx-3"> mdi-account </v-icon>
           </v-btn>
         </template>
         <v-card width="250">
+          <v-btn icon @click="ProfileMenu = false" absolute right class="mt-1 mr-n2">
+            <v-icon> mdi-close </v-icon>
+          </v-btn>
           <v-card-text align="center">
             <v-icon style="font-size: 80px"> mdi-account-circle </v-icon>
             <div class="font-weight-regular py-3">{{ $store.getters.get_current_user_details.user_email_id }}</div>
@@ -57,6 +62,26 @@
         </v-card>
       </v-menu>
     </v-app-bar>
+    <v-navigation-drawer v-model="drawer" app clipped color="primary" dark width="150">
+      <v-card-text align="center">
+        <v-card color="primary" elevation="0" @click="$router.push('/Articles')" :style="'cursor: pointer;'">
+          <v-img contain width="125px" src="@/assets/ArticlzLogo.png"></v-img>
+        </v-card>
+      </v-card-text>
+      <v-divider></v-divider>
+      <v-list dense nav>
+        <v-list-item v-for="(item, idx) in RouterList" :key="idx" link @click="OpenPage(item)">
+          <v-list-item-content>
+            <v-list-item-title class="white--text">{{ item.Name }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item @click="BecomePublisherDialog = true">
+          <v-list-item-content>
+            <v-list-item-title class="white--text">Become a Publisher</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
     <v-main>
       <router-view />
     </v-main>
@@ -88,27 +113,28 @@ export default {
     this.drawer = false;
     this.loading = false;
     this.RouterList = this.$store.getters.get_current_user_details.user_type === "READER" ? RouterListReader : RouterListPublisher;
-    console.log("RouterList", this.RouterList);
-    this.$router.push("/Articles");
+    if (this.$store.getters.get_current_route == "" && this.$store.getters.get_current_route == "") this.$router.push("/Articles");
+    else {
+      this.$router.push("/" + this.$store.getters.get_current_route);
+    }
   },
   watch: {
     "$route.name"(path) {
-      if (path == "LandingPage" && this.$store.getters.get_current_route == "Articles") {
+      if (path == "LandingPage") {
         setTimeout(() => {
-          this.$router.push("/Articles");
-        }, 100);
-      } else if (path == "LandingPage" && this.$store.getters.get_current_route == "Favorites") {
-        setTimeout(() => {
-          this.$router.push("/Favorites");
-        }, 100);
-      } else {
-        setTimeout(() => {
-          this.$router.push("/" + path);
-        }, 100);
+          if (this.$store.getters.get_current_route == "" && this.$store.getters.get_current_route == "") this.$router.push("/Articles");
+          else {
+            this.$router.push("/" + this.$store.getters.get_current_route);
+          }
+        }, 1);
       }
     },
   },
   methods: {
+    OpenPage(item) {
+      this.$store.commit("SET_DETAIL_VIEW", false);
+      this.$router.push(item.Path);
+    },
     BecomePublisherDialogExit(Toggle) {
       this.BecomePublisherDialog = false;
       if (Toggle == 2) {
@@ -123,7 +149,8 @@ export default {
     Logout() {
       this.loading = true;
       this.$store.commit("SET_ARTICLES_LIST", []);
-
+      this.$store.commit("SET_PREVIOUS_ROUTE", "");
+      this.$store.commit("SET_CURRENT_ROUTE", "");
       setTimeout(() => {
         this.RouterList = [];
         this.$router.push("/");

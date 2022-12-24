@@ -2,8 +2,13 @@
   <div class="mx-3">
     <Snackbar :SnackBarComponent="SnackBarComponent" />
     <v-toolbar v-if="CurrentView == 'LIST_VIEW'" flat class="mt-5" :color="$vuetify.theme.dark == true ? '#121212' : ''">
-      <div class="display-1 dark_text--text mt-n5">Favorites</div>
-      <v-spacer />
+      <div
+        v-if="$vuetify.breakpoint.name == 'md' || $vuetify.breakpoint.name == 'lg' || $vuetify.breakpoint.name == 'xl'"
+        class="display-1 dark_text--text mt-n5"
+      >
+        Favorites
+      </div>
+      <v-spacer v-if="$vuetify.breakpoint.name == 'md' || $vuetify.breakpoint.name == 'lg' || $vuetify.breakpoint.name == 'xl'" />
       <v-text-field
         dense
         outlined
@@ -12,13 +17,20 @@
         v-model="search"
         prepend-inner-icon="mdi-magnify"
         color="primary"
-        class="mt-3 mr-4"
-        :style="'max-width: 250px;'"
+        :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'mt-2 mr-2 ml-n3' : 'mt-3 mr-4'"
+        :style="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'max-width: 300px;' : 'max-width: 250px;'"
       >
       </v-text-field>
       <v-menu v-model="FilterMenu" bottom offset-y :close-on-content-click="false">
         <template v-slot:activator="{ on, attrs }">
-          <v-btn small color="primary" fab v-on="on" v-bind="attrs" class="elevation-1 mt-n5">
+          <v-btn
+            small
+            color="primary"
+            fab
+            v-on="on"
+            v-bind="attrs"
+            :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'elevation-1 mt-n5 mr-n3' : 'elevation-1 mt-n5'"
+          >
             <v-icon> mdi-filter-outline </v-icon>
           </v-btn>
         </template>
@@ -81,11 +93,19 @@
         </v-hover>
       </v-col>
     </v-row>
-    <v-card-text v-else-if="CurrentView == 'PUBLISH_VIEW'">
+    <v-card-text
+      v-else-if="CurrentView == 'DETAIL_VIEW'"
+      :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'ma-0 pa-0 mt-3' : ''"
+    >
       <!-- ***************************************************************************************************** -->
-      <v-carousel v-model="CurrentIdx" hide-delimiters height="auto">
+      <v-carousel
+        v-model="CurrentIdx"
+        hide-delimiters
+        height="auto"
+        :show-arrows-on-hover="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs'"
+      >
         <v-carousel-item v-for="(item, idx) in FavoritesArticlesList" :key="idx">
-          <v-row no-gutters class="mx-5 px-15">
+          <v-row no-gutters :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '' : 'mx-5 px-15'">
             <v-col cols="12" md="12" sm="12" xs="12">
               <v-toolbar flat dense class="ma-0 pa-0" :color="$vuetify.theme.dark == true ? '#121212' : ''">
                 <div class="font-weight-bold">
@@ -111,13 +131,22 @@
               </v-toolbar>
             </v-col>
             <v-col cols="12" md="12" sm="12" xs="12">
-              <div class="display-1">
+              <div :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'MobileHeading' : 'display-1'">
                 {{ item.article_title }}
               </div>
-              <div class="Description py-5">{{ item.article_description }}</div>
+              <div :class="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? 'MobileDescription py-2' : 'Description py-5'">
+                {{ item.article_description }}
+              </div>
             </v-col>
             <v-col cols="12" md="12" sm="12" xs="12">
-              <v-img class="" :src="item.image_src" alt="No Image found!" height="400px" max-width="100%" align="center"></v-img>
+              <v-img
+                class=""
+                :src="item.image_src"
+                alt="No Image found!"
+                :height="$vuetify.breakpoint.name == 'sm' || $vuetify.breakpoint.name == 'xs' ? '200px' : '400px'"
+                max-width="100%"
+                align="center"
+              ></v-img>
             </v-col>
             <v-col cols="12" md="12" sm="12" xs="12">
               <div class="mt-3">
@@ -138,6 +167,9 @@
         </v-carousel-item>
       </v-carousel>
       <!-- ***************************************************************************************************** -->
+    </v-card-text>
+    <v-card-text v-if="FavoritesArticlesList.length == 0">
+      <div class="font-weight-thin display-1">No Articles to show!</div>
     </v-card-text>
   </div>
 </template>
@@ -176,11 +208,19 @@ export default {
   components: {
     Snackbar,
   },
-  async mounted() {
+  mounted() {
+    this.PageMounted = true;
     this.FavoritesArticlesList = this.$store.getters.get_articles_list.filter((itm) => itm.favourite == true);
     this.$store.commit("SET_FAVORITES_ARTICLES_LIST", this.FavoritesArticlesList);
+    this.$store.commit("SET_PREVIOUS_ROUTE", this.$store.getters.get_current_route);
     this.$store.commit("SET_CURRENT_ROUTE", this.$route.name);
+
+    if (this.$store.getters.get_previous_route != this.$route.name && this.$store.getters.get_from_detail_view == true) {
+      this.$store.commit("SET_DETAIL_VIEW", false);
+      this.$router.push("/" + this.$store.getters.get_previous_route);
+    }
     this.CurrentView = "LIST_VIEW";
+    this.FilterMethod();
     console.warn("FavoritesArticlesList", this.FavoritesArticlesList);
   },
   watch: {
@@ -191,6 +231,13 @@ export default {
         this.FavoritesArticlesList = this.$store.getters.get_favorites_articles_list.filter((itm) =>
           itm.article_title.toLowerCase().includes(val.toLowerCase())
         );
+      }
+    },
+    CurrentView(val) {
+      if (val == "DETAIL_VIEW") {
+        this.$store.commit("SET_DETAIL_VIEW", true);
+      } else {
+        this.$store.commit("SET_DETAIL_VIEW", false);
       }
     },
   },
@@ -239,7 +286,7 @@ export default {
     CheckItem(item, idx) {
       this.CurrentIdx = idx;
       this.CurrentItem = item;
-      this.CurrentView = "PUBLISH_VIEW";
+      this.CurrentView = "DETAIL_VIEW";
     },
 
     // Loading next and previous articles

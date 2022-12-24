@@ -10,8 +10,10 @@ export default new Vuex.Store({
     CurrentUserDetails: {},
     ArticlesList: [],
     FavoritesArticlesList: [],
+    PreviousRoute: "",
     CurrentRoute: "",
     CurrentIdx: 0,
+    fromDetailView: false,
   },
   getters: {
     get_current_user_details: (state) => {
@@ -26,8 +28,14 @@ export default new Vuex.Store({
     get_current_route: (state) => {
       return state.CurrentRoute;
     },
+    get_previous_route: (state) => {
+      return state.PreviousRoute;
+    },
     get_current_idx: (state) => {
       return state.CurrentIdx;
+    },
+    get_from_detail_view: (state) => {
+      return state.fromDetailView;
     },
   },
   mutations: {
@@ -43,10 +51,17 @@ export default new Vuex.Store({
     SET_CURRENT_ROUTE(state, CurrentRoute) {
       state.CurrentRoute = CurrentRoute;
     },
+    SET_PREVIOUS_ROUTE(state, PreviousRoute) {
+      state.PreviousRoute = PreviousRoute;
+    },
     SET_CURRENT_IDX(state, CurrentIdx) {
       state.CurrentIdx = CurrentIdx;
     },
+    SET_DETAIL_VIEW(state, fromDetailView) {
+      state.fromDetailView = fromDetailView;
+    },
   },
+
   actions: {},
   modules: {},
   plugins: [createPersistedState()],
